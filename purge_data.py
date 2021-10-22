@@ -55,12 +55,12 @@ dataframe['price'] = dataframe['price'].astype(float).fillna(0.0)
  
 # On convertit les scores de reviews ou certaines colonnes sont sur 100, d'autres sur 10, d'autre sur 5 pour un score de ref sur 5
 dataframe['review_scores_rating'] = dataframe['review_scores_rating'] / 20
-dataframe['review_scores_accuracy'] = dataframe['review_scores_rating'] / 2
-dataframe['review_scores_cleanliness'] = dataframe['review_scores_rating'] / 2
-dataframe['review_scores_checkin'] = dataframe['review_scores_rating'] / 2
-dataframe['review_scores_communication'] = dataframe['review_scores_rating'] / 2
-dataframe['review_scores_location'] = dataframe['review_scores_rating'] / 2
-dataframe['review_scores_value'] = dataframe['review_scores_rating'] / 2
+dataframe['review_scores_accuracy'] = dataframe['review_scores_accuracy'] / 2
+dataframe['review_scores_cleanliness'] = dataframe['review_scores_cleanliness'] / 2
+dataframe['review_scores_checkin'] = dataframe['review_scores_checkin'] / 2
+dataframe['review_scores_communication'] = dataframe['review_scores_communication'] / 2
+dataframe['review_scores_location'] = dataframe['review_scores_location'] / 2
+dataframe['review_scores_value'] = dataframe['review_scores_value'] / 2
  
 # On récupère juste la parti du nombre de bath, pas le text
 dataframe['bathrooms_text'] = dataframe['bathrooms_text'].str[0:1]
