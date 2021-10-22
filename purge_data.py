@@ -96,4 +96,4 @@ dataframe['host_about'].replace(np.nan, '', inplace=True)
 dataframe['room_type'].replace('', np.nan, inplace=True)
 dataframe.dropna(subset=['room_type'], inplace=True)
 
-dataframe.to_csv('./airbnb_clean.csv')
+dataframe.to_csv('/user/formation29/airbnb_clean.csv')
