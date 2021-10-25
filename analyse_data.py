@@ -35,6 +35,7 @@ if __name__ == "__main__":
     # Initialisation de la table de jointure entre la liste des logements a aider et les ameliorations a faire sur le logement
     listingsImprovements = []
 
+    for listing in dataframeListingToHelp:
         # Initialisation et construction de l'objet qu'on inserera dans listingsToHelp
         listingToHelp = {}
         listingToHelp['listing_id'] = listing.id
