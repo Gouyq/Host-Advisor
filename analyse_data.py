@@ -41,17 +41,17 @@ if __name__ == "__main__":
 
     # Initialisation de la table de jointure entre la liste des logements a aider et les ameliorations a faire sur le logement
     listingsImprovements = []
-   
+
 
     for listing in dataframeListingToHelp.collect():
-  
+
         # Initialisation et construction de l'objet qu'on inserera dans listingsToHelp
         listingToHelp = {}
         listingToHelp['listing_id'] = listing.id
         listingToHelp['listing_name'] = listing.name
         listingToHelp['listing_url'] = listing.listing_url
         listingToHelp['host_name'] = listing.host_name
-
+        listingsToHelp.append(listingToHelp)
         # On recupere les logements similaires dans la liste des logements de reference
         dataframeSimilarListing = dataframeReferenceListing.filter(
           (dataframeReferenceListing.price < 1.1*listing.price) &
@@ -89,20 +89,21 @@ if __name__ == "__main__":
 
         for reference in dataframeSimilarListing.collect():
             j_ListingReference_ListingToHelp.append({"listing_id": listing.id, "reference_id": reference.id})
+            
+with open('jListingReference_ListingToHelp.csv', 'wb') as j_Help_Reference:
+    keys = j_ListingReference_ListingToHelp[0].keys()
+    csvDictWriter = csv.DictWriter(j_Help_Reference, keys)
+    csvDictWriter.writeheader()
+    csvDictWriter.writerows(j_ListingReference_ListingToHelp)
 
-        break
-       
-   
-print(j_ListingReference_ListingToHelp)
-    with open('jListingReference_ListingToHelp.csv', 'wb') as j_Help_Reference:
-        keys = j_ListingReference_ListingToHelp[0].keys()
-        csvDictWriter = csv.DictWriter(j_Help_Reference, keys)
-        csvDictWriter.writeheader()
-        csvDictWriter.writerows(j_ListingReference_ListingToHelp)
+with open('listingsImprovements.csv', 'wb') as listingsImprovementsFile:
+    keys = listingsImprovements[0].keys()
+    csvDictWriter = csv.DictWriter(listingsImprovementsFile, keys)
+    csvDictWriter.writeheader()
+    csvDictWriter.writerows(listingsImprovements)
 
-    with open('listingsImprovements.csv', 'wb') as listingsImprovementsFile:
-        keys = listingsImprovements[0].keys()
-        csvDictWriter = csv.DictWriter(listingsImprovementsFile, keys)
-        csvDictWriter.writeheader()
-        csvDictWriter.writerows(listingsImprovements)
-
+with open('listingsToHelp.csv', 'wb') as listingsToHelpFile:
+    keys = listingsToHelp[0].keys()
+    csvDictWriter = csv.DictWriter(listingsToHelpFile, keys)
+    csvDictWriter.writeheader()
+    csvDictWriter.writerows(listingsToHelp)
