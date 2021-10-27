@@ -14,6 +14,11 @@ sys.setdefaultencoding('utf-8')
 
 if __name__ == "__main__":
 
+    class ImprovementListing(object):
+        def __init__(self, listing_id, improvement_id):
+                self.listing_id = listing_id
+                self.improvement_id = improvement_id
+
     # Initialisation et configuration de la session spark
     conf = SparkConf().setAppName("AirBnb - Formation 29")
     sc = SparkContext(conf=conf)
@@ -42,9 +47,8 @@ if __name__ == "__main__":
     # Initialisation de la table de jointure entre la liste des logements a aider et les ameliorations a faire sur le logement
     listingsImprovements = []
 
-
     for listing in dataframeListingToHelp.collect():
-
+  
         # Initialisation et construction de l'objet qu'on inserera dans listingsToHelp
         listingToHelp = {}
         listingToHelp['listing_id'] = listing.id
@@ -65,31 +69,39 @@ if __name__ == "__main__":
         if dataframeSimilarListing.count() == 0:
           continue
 
-        if listing.host_has_profile_pic is not True:
-            listingsImprovements.append({"listing_id": listing.id, "improvement_id": 6})
-
-        if listing.host_identity_verified is not True:
-            listingsImprovements.append({"listing_id": listing.id, "improvement_id": 7})
-
-        avgDescriptionLength = dataframeSimilarListing.agg(mean(length(col("description"))))
-        if listing.description is not None and len(listing.description) < avgDescriptionLength:
-            listingsImprovements.append({"listing_id": listing.id, "improvement_id": 5})
-
-        avgHostAcceptanceRate = dataframeSimilarListing.select(avg("host_acceptance_rate")).collect()[0][0]
-        if listing.host_acceptance_rate < avgHostAcceptanceRate:
-            listingsImprovements.append({"listing_id": listing.id, "improvement_id": 4})
-
-        avgHostResponseTime = dataframeSimilarListing.select(avg("host_response_time")).collect()[0][0]
-        if listing.host_response_time < avgHostResponseTime:
-            listingsImprovements.append({"listing_id": listing.id, "improvement_id": 3})
-
+        # Comparaison sur le nombre de services
         avgAmenities = dataframeSimilarListing.select(avg("amenities")).collect()[0][0]
         if len(listing.amenities) < avgAmenities:
-            listingsImprovements.append({"listing_id": listing.id, "improvement_id": 3})
+            listingsImprovements.append(ImprovementListing(listing.id, 1).__dict__)
 
+        # Comparaison sur le temps de reponse moyen de l'hote
+        avgHostResponseTime = dataframeSimilarListing.select(avg("host_response_time")).collect()[0][0]
+        if listing.host_response_time < avgHostResponseTime:
+            listingsImprovements.append(ImprovementListing(listing.id, 2).__dict__)
+
+        # Comparaison sur le taux d'acceptation des reservations
+        avgHostAcceptanceRate = dataframeSimilarListing.select(avg("host_acceptance_rate")).collect()[0][0]
+        if listing.host_acceptance_rate < avgHostAcceptanceRate:
+            listingsImprovements.append(ImprovementListing(listing.id, 3).__dict__)
+
+        # Comparaison sur le fait que l'hote ait une photo de profil
+        if listing.host_has_profile_pic is not True:
+            listingsImprovements.append(ImprovementListing(listing.id, 4).__dict__)
+
+        # Comparaison sur le fait que l'hote soit verifie ou non
+        if listing.host_identity_verified is not True:
+            listingsImprovements.append(ImprovementListing(listing.id, 5).__dict__)
+
+        # Comparaison sur la taille de la description
+        avgDescriptionLength = dataframeSimilarListing.agg(mean(length(col("description"))))
+        if listing.description is not None and len(listing.description) < avgDescriptionLength:
+            listingsImprovements.append(ImprovementListing(listing.id, 6).__dict__)
+
+        # On remplit la table de jointure entre les logements a aider et les logements de reference
         for reference in dataframeSimilarListing.collect():
             j_ListingReference_ListingToHelp.append({"listing_id": listing.id, "reference_id": reference.id})
-            
+
+# Creation des fichiers qui seront utilises par la visualisation
 with open('jListingReference_ListingToHelp.csv', 'wb') as j_Help_Reference:
     keys = j_ListingReference_ListingToHelp[0].keys()
     csvDictWriter = csv.DictWriter(j_Help_Reference, keys)
