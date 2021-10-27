@@ -101,21 +101,12 @@ if __name__ == "__main__":
         for reference in dataframeSimilarListing.collect():
             j_ListingReference_ListingToHelp.append({"listing_id": listing.id, "reference_id": reference.id})
 
-# Creation des fichiers qui seront utilises par la visualisation
-with open('jListingReference_ListingToHelp.csv', 'wb') as j_Help_Reference:
-    keys = j_ListingReference_ListingToHelp[0].keys()
-    csvDictWriter = csv.DictWriter(j_Help_Reference, keys)
-    csvDictWriter.writeheader()
-    csvDictWriter.writerows(j_ListingReference_ListingToHelp)
+    # Creation des fichiers qui seront utilises par la visualisation
+    df_j_ListingReference_ListingToHelp = spark.createDataFrame(j_ListingReference_ListingToHelp)
+    df_j_ListingReference_ListingToHelp.coalesce(1).write.mode('overwrite').format('com.databricks.spark.csv').option('header','true').save('/user/formation29/jListingReference_ListingToHelp.csv')
 
-with open('listingsImprovements.csv', 'wb') as listingsImprovementsFile:
-    keys = listingsImprovements[0].keys()
-    csvDictWriter = csv.DictWriter(listingsImprovementsFile, keys)
-    csvDictWriter.writeheader()
-    csvDictWriter.writerows(listingsImprovements)
+    df_listingsToHelp = spark.createDataFrame(listingsToHelp)
+    df_listingsToHelp.coalesce(1).write.mode('overwrite').format('com.databricks.spark.csv').option('header','true').save('/user/formation29/listingsToHelp.csv')
 
-with open('listingsToHelp.csv', 'wb') as listingsToHelpFile:
-    keys = listingsToHelp[0].keys()
-    csvDictWriter = csv.DictWriter(listingsToHelpFile, keys)
-    csvDictWriter.writeheader()
-    csvDictWriter.writerows(listingsToHelp)
+    df_listingsImprovements = spark.createDataFrame(listingsImprovements)
+    df_listingsImprovements.coalesce(1).write.mode('overwrite').format('com.databricks.spark.csv').option('header','true').save('/user/formation29/listingsImprovements.csv')
